@@ -1,45 +1,63 @@
-# Caffe
+# transfer-caffe
 
-[![Build Status](https://travis-ci.org/BVLC/caffe.svg?branch=master)](https://travis-ci.org/BVLC/caffe)
-[![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
+This is a caffe repository for transfer learning. We fork the repository with version ID `29cdee7` from [Caffe](https://github.com/BVLC/caffe) and make our modifications. The main modifications are listed as follow:
 
-Caffe is a deep learning framework made with expression, speed, and modularity in mind.
-It is developed by Berkeley AI Research ([BAIR](http://bair.berkeley.edu))/The Berkeley Vision and Learning Center (BVLC) and community contributors.
+- Add `mmd layer` described in paper "Learning Transferable Features with Deep Adaptation Networks".
+- Add `entropy layer` and `outerproduct layer` described in paper "Unsupervised Domain Adaptation with Residual Transfer Networks".
+- Copy `grl layer` and `messenger.hpp` from repository [Caffe](https://github.com/ddtm/caffe/tree/grl).
+- Emit `SOLVER_ITER_CHANGE` message in `solver.cpp` when `iter_` changes.
 
-Check out the [project site](http://caffe.berkeleyvision.org) for all the details like
+Data Preparation
+---------------
+In `data/office/*.txt`, we give the lists of three domains in [Office](https://cs.stanford.edu/~jhoffman/domainadapt/#datasets_code) dataset.
 
-- [DIY Deep Learning for Vision with Caffe](https://docs.google.com/presentation/d/1UeKXVgRvvxg9OUdh_UiC5G71UMscNPlvArsWER41PsU/edit#slide=id.p)
-- [Tutorial Documentation](http://caffe.berkeleyvision.org/tutorial/)
-- [BAIR reference models](http://caffe.berkeleyvision.org/model_zoo.html) and the [community model zoo](https://github.com/BVLC/caffe/wiki/Model-Zoo)
-- [Installation instructions](http://caffe.berkeleyvision.org/installation.html)
+Training Model
+---------------
 
-and step-by-step examples.
+In `models/DAN/amazon_to_webcam`, we give an example model based on Alexnet to show how to transfer from `amazon` to `webcam`. In this model, we insert mmd layers after fc7 and fc8 individually.
 
-## Custom distributions
+The [bvlc\_reference\_caffenet](http://dl.caffe.berkeleyvision.org/bvlc_reference_caffenet.caffemodel) is used as the pre-trained model. If the Office dataset and pre-trained caffemodel is prepared, the example can be run with the following command:
+```
+"./build/tools/caffe train -solver models/DAN/amazon_to_webcam/solver.prototxt -weights models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel"
+```
 
- - [Intel Caffe](https://github.com/BVLC/caffe/tree/intel) (Optimized for CPU and support for multi-node), in particular Xeon processors (HSW, BDW, Xeon Phi).
-- [OpenCL Caffe](https://github.com/BVLC/caffe/tree/opencl) e.g. for AMD or Intel devices.
-- [Windows Caffe](https://github.com/BVLC/caffe/tree/windows)
+Parameter Tuning
+---------------
+In mmd-layer, parameter `loss_weight` can be tuned to give mmd loss different weights.
 
-## Community
-
-[![Join the chat at https://gitter.im/BVLC/caffe](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/BVLC/caffe?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Please join the [caffe-users group](https://groups.google.com/forum/#!forum/caffe-users) or [gitter chat](https://gitter.im/BVLC/caffe) to ask questions and talk about methods and models.
-Framework development discussions and thorough bug reports are collected on [Issues](https://github.com/BVLC/caffe/issues).
-
-Happy brewing!
-
-## License and Citation
-
-Caffe is released under the [BSD 2-Clause license](https://github.com/BVLC/caffe/blob/master/LICENSE).
-The BAIR/BVLC reference models are released for unrestricted use.
-
-Please cite Caffe in your publications if it helps your research:
-
-    @article{jia2014caffe,
-      Author = {Jia, Yangqing and Shelhamer, Evan and Donahue, Jeff and Karayev, Sergey and Long, Jonathan and Girshick, Ross and Guadarrama, Sergio and Darrell, Trevor},
-      Journal = {arXiv preprint arXiv:1408.5093},
-      Title = {Caffe: Convolutional Architecture for Fast Feature Embedding},
-      Year = {2014}
+Citation
+---------------
+    @inproceedings{DBLP:conf/icml/LongC0J15,
+      author    = {Mingsheng Long and
+                   Yue Cao and
+                   Jianmin Wang and
+                   Michael I. Jordan},
+      title     = {Learning Transferable Features with Deep Adaptation Networks},
+      booktitle = {Proceedings of the 32nd International Conference on Machine Learning,
+                   {ICML} 2015, Lille, France, 6-11 July 2015},
+      pages     = {97--105},
+      year      = {2015},
+      crossref  = {DBLP:conf/icml/2015},
+      url       = {http://jmlr.org/proceedings/papers/v37/long15.html},
+      timestamp = {Tue, 12 Jul 2016 21:51:15 +0200},
+      biburl    = {http://dblp2.uni-trier.de/rec/bib/conf/icml/LongC0J15},
+      bibsource = {dblp computer science bibliography, http://dblp.org}
+    }
+    
+    @inproceedings{DBLP:conf/nips/LongZ0J16,
+      author    = {Mingsheng Long and
+                   Han Zhu and
+                   Jianmin Wang and
+                   Michael I. Jordan},
+      title     = {Unsupervised Domain Adaptation with Residual Transfer Networks},
+      booktitle = {Advances in Neural Information Processing Systems 29: Annual Conference
+                   on Neural Information Processing Systems 2016, December 5-10, 2016,
+                   Barcelona, Spain},
+      pages     = {136--144},
+      year      = {2016},
+      crossref  = {DBLP:conf/nips/2016},
+      url       = {http://papers.nips.cc/paper/6110-unsupervised-domain-adaptation-with-residual-transfer-networks},
+      timestamp = {Fri, 16 Dec 2016 19:45:58 +0100},
+      biburl    = {http://dblp.uni-trier.de/rec/bib/conf/nips/LongZ0J16},
+      bibsource = {dblp computer science bibliography, http://dblp.org}
     }
