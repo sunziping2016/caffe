@@ -261,6 +261,29 @@ class BilinearFiller : public Filler<Dtype> {
   }
 };
 
+template <typename Dtype>
+class UnitFiller : public Filler<Dtype> {
+public:
+    explicit UnitFiller(const FillerParameter& param)
+            : Filler<Dtype>(param) {}
+    virtual void Fill(Blob<Dtype>* blob) {
+        CHECK_EQ(blob->num_axes(), 2) << "Blob must be 2 dim.";
+        CHECK_EQ(blob->num(), blob->channels()) << "Filter must be square";
+        Dtype* data = blob->mutable_cpu_data();
+        int data_num = blob->num();
+        for (int i = 0; i < data_num; ++i) {
+            for (int j = 0; j < data_num; j++){
+                if(i==j){
+                    data[i*data_num+j] = Dtype(1);
+                }
+                else{
+                    data[i*data_num+j] = Dtype(0);
+                }
+            }
+        }
+    }
+};
+
 /**
  * @brief Get a specific filler from the specification given in FillerParameter.
  *
@@ -284,6 +307,8 @@ Filler<Dtype>* GetFiller(const FillerParameter& param) {
     return new MSRAFiller<Dtype>(param);
   } else if (type == "bilinear") {
     return new BilinearFiller<Dtype>(param);
+  } else if (type == "unit") {
+      return new UnitFiller<Dtype>(param);
   } else {
     CHECK(false) << "Unknown filler name: " << param.type();
   }
