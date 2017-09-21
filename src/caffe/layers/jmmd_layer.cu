@@ -396,13 +396,11 @@ void JMMDLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
         tempY2 = diff_.mutable_gpu_diff() + total_num_ * total_num_ + dim_ + dim_ + label_dim;
     }
     for(int i = 0;i < sample_num;++i){
-        s1 = rand() % source_num_;
-        s2 = rand() % source_num_;
-        s2 = (s1 != s2) ? s2 : (s2 + 1) % source_num_;
+        s1 = i;
+        s2 = (i + 1) % source_num_;
         
-        t1 = rand() % target_num_;
-        t2 = rand() % target_num_;
-        t2 = (t1 != t2) ? t2 : (t2 + 1) % target_num_;
+        t1 = s1;
+        t2 = s2;
         
         Dtype square_sum = 0;
         Dtype factor_for_diff = 0;
